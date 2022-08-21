@@ -1,0 +1,31 @@
+<idea-plugin>
+    <id>org.yh.statistics.plugin</id>
+    <name>Statistics View</name>
+    <vendor email="wangyaohuicn@gmail.com">Yaohui Wang</vendor>
+    <description><![CDATA[
+    Record IDE code browsing activity and show statistics in the project view.
+  ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <treeStructureProvider implementation="org.yh.statistics.view.MyViewTreeStructureProvider"/>
+        <projectViewNodeDecorator implementation="org.yh.statistics.view.MyViewNodeDecorator"/>
+        <postStartupActivity implementation="org.yh.statistics.PostStartupActivity"/>
+    </extensions>
+
+    <projectListeners>
+        <listener class="org.yh.statistics.listener.MyFileEditorManagerListener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
+
+    <applicationListeners>
+        <listener class="org.yh.statistics.listener.MyFrameStateListener"
+                  topic="com.intellij.ide.FrameStateListener"/>
+    </applicationListeners>
+
+    <actions>
+        <action id="StatisticsViewAction" class="org.yh.statistics.StatisticsViewAction">
+            <add-to-group group-id="ProjectViewToolbar" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>
