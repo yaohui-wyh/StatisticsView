@@ -1,11 +1,2 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M32.0845 7.94025V4H24.0203V7.9896H16.029V4H7.91553V7.94025H4V36H16.0044V32.0045C16.0058 30.9457 16.4274 29.9308 17.1766 29.1826C17.9258 28.4345 18.9412 28.0143 20 28.0143C21.0588 28.0143 22.0743 28.4345 22.8234 29.1826C23.5726 29.9308 23.9942 30.9457 23.9956 32.0045V36H36V7.94025H32.0845Z"
-          fill="url(#paint0_linear)"/>
-    <defs>
-        <linearGradient id="paint0_linear" x1="2.94192" y1="4.89955" x2="37.7772" y2="39.7345" gradientUnits="userSpaceOnUse">
-            <stop offset="0.15937" stop-color="#3BEA62"/>
-            <stop offset="0.5404" stop-color="#3C99CC"/>
-            <stop offset="0.93739" stop-color="#6B57FF"/>
-        </linearGradient>
-    </defs>
-</svg>
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1661075731179" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1580" width="40" height="40" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><style type="text/css">@font-face { font-family: feedback-iconfont; src: url("//at.alicdn.com/t/font_1031158_u69w8yhxdu.woff2?t=1630033759944") format("woff2"), url("//at.alicdn.com/t/font_1031158_u69w8yhxdu.woff?t=1630033759944") format("woff"), url("//at.alicdn.com/t/font_1031158_u69w8yhxdu.ttf?t=1630033759944") format("truetype"); }
+</style></defs><path d="M925.24 81.81H119.78c-26.11 0-47.27 21.16-47.27 47.27v623.41c0 26.11 21.16 47.27 47.27 47.27h336.83v101.62h-43.36c-20.67 0-40.15 9.68-52.64 26.16L336.01 960H709l-24.6-32.47a66.023 66.023 0 0 0-52.64-26.16H588.4V799.76h336.83c26.11 0 47.27-21.16 47.27-47.27V129.08c0.01-26.11-21.15-47.27-47.26-47.27z m-9.68 616.65c0 16.04-13 29.04-29.04 29.04H158.5c-16.04 0-29.04-13-29.04-29.04V183.11c0-16.04 13-29.04 29.04-29.04h728.02c16.04 0 29.04 13 29.04 29.04v515.35z" p-id="1581" fill="#13227a"></path><path d="M611.55 397.25l-72.02 69.68-65.04-49.6c-7.88-6-18.93-5.5-26.23 1.2L303.8 551.09c-8.33 7.64-8.88 20.58-1.24 28.9 4.03 4.4 9.54 6.63 15.07 6.63 4.94 0 9.9-1.78 13.83-5.39L463.3 460.25l65.41 49.87c8.04 6.13 19.35 5.47 26.62-1.56l84.21-81.48 40.89 43.59 46.96-155.26-157.94 36.96 42.1 44.88z" p-id="1582" fill="#13227a"></path></svg>
