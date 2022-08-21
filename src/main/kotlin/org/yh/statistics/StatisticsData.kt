@@ -52,8 +52,10 @@ class StatisticsData(private val project: Project) {
     }
 
     fun saveData() {
-        log.writeEvents(events)
-        events.clear()
+        if (events.isNotEmpty()) {
+            log.writeEvents(events)
+            events.clear()
+        }
     }
 
     fun clearData() {
