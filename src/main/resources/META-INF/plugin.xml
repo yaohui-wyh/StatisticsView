@@ -1,12 +1,9 @@
 <idea-plugin>
     <id>org.yh.statistics.plugin</id>
     <name>Statistics View</name>
-    <vendor email="wangyaohuicn@gmail.com">Yaohui Wang</vendor>
-    <description><![CDATA[
-    Record IDE code browsing activity and show statistics in the project view.
-  ]]></description>
-
+    <vendor>yaohui.wyh</vendor>
     <depends>com.intellij.modules.platform</depends>
+
     <extensions defaultExtensionNs="com.intellij">
         <treeStructureProvider implementation="org.yh.statistics.view.MyViewTreeStructureProvider"/>
         <projectViewNodeDecorator implementation="org.yh.statistics.view.MyViewNodeDecorator"/>
