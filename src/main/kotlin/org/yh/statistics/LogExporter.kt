@@ -15,7 +15,7 @@ import java.nio.file.Paths
 @Service(Service.Level.PROJECT)
 class LogExporter(private val project: Project) {
 
-    private var logFile = initDataFile()
+    var logFile = initDataFile()
 
     private fun initDataFile(): File? {
         val basePath = project.basePath ?: return null

@@ -4,7 +4,8 @@ package org.yh.statistics
 object Constants {
 
     const val NAME = "Statistics View"
-    const val DATA_FILE = "stat.dat"
+    const val DATA_FILE = "stat.log"
+    const val GITHUB_URL = "https://github.com/yaohui-wyh/StatisticsView"
 }
 
 enum class StatisticsAction {

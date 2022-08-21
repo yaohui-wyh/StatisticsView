@@ -1,6 +1,8 @@
 package org.yh.statistics
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.BrowserUtil
+import com.intellij.ide.actions.RevealFileAction
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.projectView.impl.ProjectViewImpl
 import com.intellij.openapi.actionSystem.*
@@ -56,7 +58,7 @@ val enableLoggingAction = MyToggleOptionAction { project ->
 
 val showFileViewStatisticsAction = MyToggleOptionAction { project ->
     object : Option {
-        override fun getName() = "Show File View Statistics"
+        override fun getName() = "Show File Statistics"
         override fun isSelected() = project.service<PluginSettings>().showFileViewStatistics
         override fun setSelected(selected: Boolean) {
             project.service<PluginSettings>().showFileViewStatistics = selected
@@ -90,12 +92,27 @@ val hideViewedFilesAction = MyToggleOptionAction { project ->
 val clearDataAction = object : DumbAwareAction("Clear Statistics Data") {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
-        val confirm = MessageDialogBuilder.yesNo("Clear Data", "Are you sure you want to clear all statistics data?")
-            .ask(project)
+        val confirm = MessageDialogBuilder.yesNo(
+            "Clear Data",
+            "Are you sure you want to clear all statistics data for project ${project.name}?"
+        ).ask(project)
         if (confirm) {
             project.service<StatisticsData>().clearData()
             project.refreshView()
         }
+    }
+}
+
+val showDataFileAction = object : DumbAwareAction("Show Data File") {
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: return
+        project.service<LogExporter>().logFile?.let { RevealFileAction.openFile(it) }
+    }
+}
+
+val feedbackAndBugReportAction = object : DumbAwareAction({ "Feedback / BugReport" }, AllIcons.Vcs.Vendors.Github) {
+    override fun actionPerformed(e: AnActionEvent) {
+        BrowserUtil.browse(Constants.GITHUB_URL)
     }
 }
 
@@ -109,6 +126,9 @@ fun getActions(): DefaultActionGroup {
     actionGroup.add(hideViewedFilesAction)
     actionGroup.addSeparator("Statistics Data")
     actionGroup.add(clearDataAction)
+    actionGroup.add(showDataFileAction)
+    actionGroup.addSeparator()
+    actionGroup.add(feedbackAndBugReportAction)
     return actionGroup
 }
 
