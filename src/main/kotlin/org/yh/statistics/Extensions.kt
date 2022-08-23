@@ -42,30 +42,30 @@ fun VirtualFile.shouldHandleStatistics(project: Project): Boolean {
     return true
 }
 
-fun Long.toLocalDate(): LocalDateTime? = LocalDateTime.ofInstant(
-    Instant.ofEpochMilli(this),
-    ZoneId.systemDefault()
-)
+val Long.localDate: LocalDateTime?
+    get() = LocalDateTime.ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
 
-fun Long.duration(): String {
-    val millis = Duration.ofMillis(this)
-    return when {
-        millis.toMinutes() <= 0 -> "${millis.toSeconds()}s"
-        millis.toHours() <= 0 -> "${millis.toMinutes()}m"
-        millis.toDays() <= 0 -> "${millis.toHours()}h"
-        else -> "${millis.toDays()}d"
+val Long.duration: String
+    get() {
+        val millis = Duration.ofMillis(this)
+        return when {
+            millis.toMinutes() <= 0 -> "${millis.toSeconds()}s"
+            millis.toHours() <= 0 -> "${millis.toMinutes()}m"
+            millis.toDays() <= 0 -> "${millis.toHours()}h"
+            else -> "${millis.toDays()}d"
+        }
     }
-}
 
-fun LocalDateTime.delta(): String {
-    val delta = Duration.between(this, LocalDateTime.now())
-    return when {
-        delta.toMinutes() <= 0 -> "just now"
-        delta.toHours() <= 0 -> "${delta.toMinutes()} minutes ago"
-        delta.toDays() <= 0 -> "${delta.toHours()} hours ago"
-        else -> "${delta.toDays()} days ago"
+val LocalDateTime.delta: String
+    get() {
+        val delta = Duration.between(this, LocalDateTime.now())
+        return when {
+            delta.toMinutes() <= 0 -> "just now"
+            delta.toHours() <= 0 -> "${delta.toMinutes()} minutes ago"
+            delta.toDays() <= 0 -> "${delta.toHours()} hours ago"
+            else -> "${delta.toDays()} days ago"
+        }
     }
-}
 
 fun Project.refreshView() {
     ProjectView.getInstance(this).refresh()

@@ -3,9 +3,9 @@ package org.yh.statistics.model
 import org.yh.statistics.StatisticsAction.*
 import org.yh.statistics.delta
 import org.yh.statistics.duration
+import org.yh.statistics.localDate
 import org.yh.statistics.model.FileState.*
 import org.yh.statistics.model.FileState.UNKNOWN
-import org.yh.statistics.toLocalDate
 
 class FileAggregateResult(
     var openCounts: Int = 0,
@@ -41,11 +41,11 @@ class FileAggregateResult(
     fun getLastViewedHintText(): String {
         var lastViewedHintText = ""
         if (lastClosedTs > 0) {
-            lastClosedTs.toLocalDate()?.delta()?.let { lastViewedHintText = "Last viewed: $it." }
+            lastClosedTs.localDate?.delta?.let { lastViewedHintText = "Last viewed: $it." }
         }
         if (openCounts > 1 && totalInMillis > 1_000) {
             val countsStr = if (openCounts > 100) "100+" else openCounts
-            lastViewedHintText += " ($countsStr times, total ${totalInMillis.duration()})"
+            lastViewedHintText += " ($countsStr times, total ${totalInMillis.duration})"
         }
         return lastViewedHintText
     }
