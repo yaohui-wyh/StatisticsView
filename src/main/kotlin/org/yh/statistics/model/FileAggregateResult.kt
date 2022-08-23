@@ -1,41 +1,55 @@
 package org.yh.statistics.model
 
+import org.yh.statistics.StatisticsAction
 import org.yh.statistics.StatisticsAction.*
 import org.yh.statistics.delta
 import org.yh.statistics.duration
 import org.yh.statistics.localDate
-import org.yh.statistics.model.FileState.*
-import org.yh.statistics.model.FileState.UNKNOWN
+import java.time.Duration
 
 class FileAggregateResult(
     var openCounts: Int = 0,
     var totalInMillis: Long = 0,
-    private var lastOpenedTs: Timestamp = 0,
-    private var lastClosedTs: Timestamp = 0,
-    private var state: FileState = UNKNOWN
+    private var lastClosedTs: Timestamp = 0
 ) {
 
-    fun accumulate(event: StatisticsEvent) {
-        val prevState = state
-        state = when (event.action) {
-            FILE_OPENED -> FOCUS_GAINED
-            IDE_ACTIVATED -> FOCUS_GAINED
-            FILE_CLOSED -> FOCUS_LOST
-            IDE_DEACTIVATED -> FOCUS_LOST
-            else -> prevState
+    private var fileState: StatisticsAction? = null
+    private var focusState: FocusState = FocusLost(0)
+
+    private fun updateOpenCounts(event: StatisticsEvent) {
+        val prevFileState = fileState
+        if (event.action in setOf(FILE_OPENED, FILE_CLOSED)) {
+            fileState = event.action
         }
-        if (prevState == FOCUS_GAINED && state == FOCUS_LOST) {
-            if (lastOpenedTs > 0) {
-                totalInMillis += (event.ts - lastOpenedTs)
-            }
-        }
-        if (prevState in listOf(UNKNOWN, FOCUS_LOST) && state == FOCUS_GAINED) {
-            lastOpenedTs = event.ts
+        if (prevFileState == FILE_OPENED && fileState == FILE_CLOSED) {
             openCounts++
         }
-        if (prevState == FOCUS_GAINED && event.action == FILE_CLOSED) {
+    }
+
+    private fun updateTotalTime(event: StatisticsEvent) {
+        when (val prevFocusState = focusState) {
+            is FocusLost -> if (event.action == FILE_OPENED || (fileState == FILE_OPENED && event.action == IDE_ACTIVATED)) {
+                focusState = FocusGained(event.ts)
+            }
+            is FocusGained -> if (event.action in setOf(FILE_CLOSED, IDE_DEACTIVATED)) {
+                focusState = FocusLost(event.ts)
+                val duration = focusState.ts - prevFocusState.ts
+                // TODO: makes timespans max duration configurable
+                totalInMillis += minOf(duration, Duration.ofMinutes(30).toMillis())
+            }
+        }
+    }
+
+    private fun updateLastClosedTs(event: StatisticsEvent) {
+        if (event.action == FILE_CLOSED) {
             lastClosedTs = event.ts
         }
+    }
+
+    fun accumulate(event: StatisticsEvent) {
+        updateOpenCounts(event)
+        updateTotalTime(event)
+        updateLastClosedTs(event)
     }
 
     fun getLastViewedHintText(): String {
@@ -51,8 +65,8 @@ class FileAggregateResult(
     }
 }
 
-enum class FileState {
-    UNKNOWN, FOCUS_GAINED, FOCUS_LOST,
-}
+sealed class FocusState(var ts: Timestamp)
+class FocusGained(ts: Timestamp) : FocusState(ts)
+class FocusLost(ts: Timestamp) : FocusState(ts)
 
 typealias Timestamp = Long
