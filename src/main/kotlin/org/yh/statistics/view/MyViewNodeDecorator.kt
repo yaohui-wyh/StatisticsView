@@ -13,10 +13,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiUtilCore
 import com.intellij.structuralsearch.plugin.util.SmartPsiPointer
 import com.intellij.ui.ColoredTreeCellRenderer
-import org.yh.statistics.PluginSettings
-import org.yh.statistics.StatisticsData
-import org.yh.statistics.relativeUrl
-import org.yh.statistics.shouldHandleStatistics
+import org.yh.statistics.*
 import kotlin.math.roundToInt
 
 
@@ -54,8 +51,11 @@ class MyViewNodeDecorator(private val project: Project) : ProjectViewNodeDecorat
         VfsUtil.iterateChildrenRecursively(file, { it.shouldHandleStatistics(project) }) { f ->
             if (!f.isDirectory) {
                 directoryInfo.total++
-                if (dataManager.isFileViewed(f.relativeUrl(project))) {
-                    directoryInfo.viewed++
+                dataManager.getFileAggregateResult(f.relativeUrl(project))?.let {
+                    if (it.openCounts > 0) {
+                        directoryInfo.viewed++
+                    }
+                    directoryInfo.totalTimeInMillis += it.totalInMillis
                 }
             }
             return@iterateChildrenRecursively true
@@ -66,6 +66,20 @@ class MyViewNodeDecorator(private val project: Project) : ProjectViewNodeDecorat
     override fun decorate(node: PackageDependenciesNode?, cellRenderer: ColoredTreeCellRenderer?) {}
 }
 
-data class DirectoryViewedInfo(var total: Int = 0, var viewed: Int = 0) {
-    override fun toString() = if (total > 0 && viewed > 0) "${(100.0 * viewed / total).roundToInt()}% viewed" else ""
+data class DirectoryViewedInfo(
+    var total: Int = 0,
+    var viewed: Int = 0,
+    var totalTimeInMillis: Long = 0,
+) {
+    override fun toString(): String {
+        return if (total > 0 && viewed > 0) {
+            var text = "${(100.0 * viewed / total).roundToInt()}% viewed"
+            if (totalTimeInMillis > 1_000) {
+                text += " (total ${totalTimeInMillis.duration})"
+            }
+            text
+        } else {
+            ""
+        }
+    }
 }
