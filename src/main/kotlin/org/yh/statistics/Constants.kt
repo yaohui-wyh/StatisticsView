@@ -9,6 +9,8 @@ object Constants {
 }
 
 enum class StatisticsAction {
+    UNKNOWN,
+
     IDE_ACTIVATED,
     IDE_DEACTIVATED,
 

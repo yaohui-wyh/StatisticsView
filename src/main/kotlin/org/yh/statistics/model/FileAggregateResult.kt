@@ -4,6 +4,7 @@ import org.yh.statistics.StatisticsAction.*
 import org.yh.statistics.delta
 import org.yh.statistics.duration
 import org.yh.statistics.model.FileState.*
+import org.yh.statistics.model.FileState.UNKNOWN
 import org.yh.statistics.toLocalDate
 
 class FileAggregateResult(
