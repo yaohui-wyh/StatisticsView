@@ -3,7 +3,10 @@
 Statistics View IntelliJ Plugin
 ===
 
-[![Build](https://github.com/yaohui-wyh/StatisticsView/actions/workflows/build.yml/badge.svg)](https://github.com/yaohui-wyh/StatisticsView/actions/workflows/build.yml)
+[![Build][github-action-svg]][github-action-build]
+[![Version][plugin-version-svg]][plugin-repo]
+[![Downloads][plugin-downloads-svg]][plugin-repo]
+[![Rating][plugin-rating-svg]][plugin-repo]
 
 <!-- Plugin description -->
 **StatisticsView** IntelliJ plugin enables logging IDE code browsing activities and shows aggregated statistical information (e.g. accumulated file opened times) in the IDE Project view.
@@ -80,3 +83,12 @@ Example of log file:
 #### TimescaleDB & Grafana dashboard [WIP]
 
 <img src="docs/grafana.png" width="800"/>
+
+<!-- Badges -->
+
+[github-action-build]: https://github.com/yaohui-wyh/StatisticsView/actions/workflows/build.yml
+[github-action-svg]: https://github.com/yaohui-wyh/StatisticsView/actions/workflows/build.yml/badge.svg
+[plugin-repo]: https://plugins.jetbrains.com/plugin/19747-statistics-view
+[plugin-downloads-svg]: http://img.shields.io/jetbrains/plugin/d/19747
+[plugin-rating-svg]: http://img.shields.io/jetbrains/plugin/r/stars/19747
+[plugin-version-svg]: https://img.shields.io/jetbrains/plugin/v/19747?label=version
