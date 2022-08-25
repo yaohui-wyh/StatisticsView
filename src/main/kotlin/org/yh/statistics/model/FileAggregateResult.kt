@@ -57,7 +57,7 @@ class FileAggregateResult(
         if (lastClosedTs > 0) {
             lastClosedTs.localDate?.delta?.let { lastViewedHintText = "Last viewed: $it." }
         }
-        if (openCounts > 1 && totalInMillis > 1_000) {
+        if (openCounts > 0 && totalInMillis > 1_000) {
             val countsStr = if (openCounts > 100) "100+" else openCounts
             lastViewedHintText += " ($countsStr times, total ${totalInMillis.duration})"
         }
