@@ -19,6 +19,7 @@ import org.yh.statistics.Constants.NAME
 import java.awt.event.MouseEvent
 import java.util.function.Function
 import java.util.function.Supplier
+import javax.swing.SwingConstants.CENTER
 
 class StatisticsViewAction : ToggleAction(Supplier { NAME }, AllIcons.Actions.ProfileBlue), DumbAware {
 
@@ -35,7 +36,15 @@ class StatisticsViewAction : ToggleAction(Supplier { NAME }, AllIcons.Actions.Pr
     override fun setSelected(e: AnActionEvent, state: Boolean) {
         val context = e.dataContext
         val event = e.inputEvent as? MouseEvent ?: return
-        getPopup(context).show(RelativePoint(event))
+        val popup = getPopup(context)
+        e.project?.let {
+            it.service<StatisticsData>().summaryInfo.let { info ->
+                if (info.eventCounts > 0) {
+                    popup.setAdText("${info.eventCounts} IDE events handled", CENTER)
+                }
+            }
+        }
+        popup.show(RelativePoint(event))
     }
 }
 

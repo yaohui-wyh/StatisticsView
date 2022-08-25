@@ -12,12 +12,20 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.yh.statistics.Constants.DATA_FILE
+import org.yh.statistics.Constants.MAX_LOG_LINE
 import org.yh.statistics.model.StatisticsEvent
 import java.io.File
 import java.lang.System.lineSeparator
 import java.nio.file.Paths
 
 
+/**
+ * Read/Write raw log events to file.
+ *
+ * - A Log is a timestamped {@link StatisticsEvent} emitted by DataProvider {@link StatisticsData}.
+ * - FS is the only underlying storage system right now,
+ * however we could use some Log agent (e.g. OTel Collector) to emit logs to some backend
+ */
 @Service(Service.Level.PROJECT)
 class LogExporter(private val project: Project) {
 
@@ -50,13 +58,20 @@ class LogExporter(private val project: Project) {
     fun importEvents(): List<StatisticsEvent> {
         logFile?.let { file ->
             return try {
-                file.readLines().mapNotNull { json.decode(it) }
+                file.useLines { parseLines(it) }
             } catch (ex: Exception) {
                 thisLogger().d { "readDate exception, $ex" }
                 emptyList()
             }
         }
         return emptyList()
+    }
+
+    private fun parseLines(lines: Sequence<String>): List<StatisticsEvent> {
+        return lines
+            .take(MAX_LOG_LINE)
+            .mapNotNull { json.decode<StatisticsEvent>(it) }
+            .toList()
     }
 
     @OptIn(ExperimentalSerializationApi::class)

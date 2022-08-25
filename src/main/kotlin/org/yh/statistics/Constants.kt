@@ -6,6 +6,7 @@ object Constants {
     const val NAME = "Statistics View"
     const val DATA_FILE = "stat.log"
     const val GITHUB_URL = "https://github.com/yaohui-wyh/StatisticsView"
+    const val MAX_LOG_LINE = 500 * 1000
 }
 
 enum class StatisticsAction {

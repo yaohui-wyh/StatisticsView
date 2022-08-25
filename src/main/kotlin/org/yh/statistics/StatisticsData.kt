@@ -32,6 +32,7 @@ class StatisticsData(private val project: Project) {
     private val log = project.service<LogExporter>()
     private val scheduler = AppExecutorUtil.getAppScheduledExecutorService()
     private val app = ApplicationManager.getApplication()
+    var summaryInfo = StatisticsSummaryInfo()
 
     init {
         // request pool thread to execute IO bound tasks
@@ -65,6 +66,7 @@ class StatisticsData(private val project: Project) {
         log.clearData()
         events.clear()
         resultMap.clear()
+        summaryInfo = StatisticsSummaryInfo()
     }
 
     @VisibleForTesting
@@ -80,6 +82,9 @@ class StatisticsData(private val project: Project) {
                     events.forEach { event -> resultMap.values.forEach { it.accumulate(event) } }
                 }
             }
+        summaryInfo.eventCounts += list.size
     }
 
 }
+
+data class StatisticsSummaryInfo(var eventCounts: Long = 0)
