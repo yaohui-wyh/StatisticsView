@@ -1,5 +1,6 @@
 package org.yh.statistics
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -30,12 +31,14 @@ class StatisticsData(private val project: Project) {
 
     private val log = project.service<LogExporter>()
     private val scheduler = AppExecutorUtil.getAppScheduledExecutorService()
+    private val app = ApplicationManager.getApplication()
 
     init {
-        addEvents(log.importEvents())
+        // request pool thread to execute IO bound tasks
+        app.executeOnPooledThread { processEvents(log.importEvents()) }
         scheduler.scheduleWithFixedDelay({
             if (project.service<PluginSettings>().enableLogging) {
-                runInEdt { saveData() }
+                app.executeOnPooledThread { saveData() }
             }
         }, 30, 30, TimeUnit.SECONDS)
     }
