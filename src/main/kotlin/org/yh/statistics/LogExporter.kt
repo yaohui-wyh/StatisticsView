@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json
 import org.yh.statistics.Constants.DATA_FILE
 import org.yh.statistics.model.StatisticsEvent
 import java.io.File
+import java.lang.System.lineSeparator
 import java.nio.file.Paths
 
 
@@ -62,7 +63,7 @@ class LogExporter(private val project: Project) {
     fun writeEvents(events: List<StatisticsEvent>) {
         logFile?.let { file ->
             try {
-                file.appendText("\n${events.joinToString("\n") { json.encodeToString(it) }}")
+                file.appendText("${events.joinToString(lineSeparator()) { json.encodeToString(it) }}${lineSeparator()}")
             } catch (ex: Exception) {
                 thisLogger().d { "writeEvents exception, $ex" }
             }
