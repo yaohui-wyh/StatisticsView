@@ -3,6 +3,11 @@ Statistics View IntelliJ Plugin Changelog
 
 ## [Unreleased]
 
+## [1.0.1]
+
+- Add total viewed time for directory node in the Project view
+- Fix timestamp aggregation algorithm
+
 ## [1.0.0]
 
 - Add IDE events logging capabilities

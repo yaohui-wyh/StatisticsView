@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: timescaledb
+          image: timescale/timescaledb:latest-pg14
+          env:
+            - name: POSTGRES_PASSWORD
+              value: postgres
+          ports:
+            - containerPort: 5432
+          resources:
+            requests:
+              cpu: "1"
+              memory: "1Gi"
+          volumeMounts:
+            - name: ide-data-log
+              mountPath: /tmp/stat.log
+              subPath: stat.log
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d/100_init.sql
+              subPath: 100_init.sql
+      volumes:
+        - name: ide-data-log
+          configMap:
+            name: ide-data-log
+        - name: init-sql
+          configMap:
+            name: init-sql

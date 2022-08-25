@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - postgres.yaml
+  - service.yaml
+configMapGenerator:
+  - name: ide-data-log
+    files:
+      - stat.log
+  - name: init-sql
+    files:
+      - 100_init.sql

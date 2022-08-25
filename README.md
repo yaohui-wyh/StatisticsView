@@ -19,9 +19,12 @@ More information can be found on [GitHub](https://github.com/yaohui-wyh/Statisti
 
 <img src="docs/demo.gif" width="640" alt="demo"/>
 
-## Usage
+## Installation
 
-> **StatisticsView** can be installed via `Settings | Plugins`. See the [detailed instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#) from JetBrains guide.
+- **StatisticsView** can be installed from an IntelliJ IDE via `Settings | Plugins`. See the [detailed instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#) from the JetBrains guide.
+- Alternatively, download the latest plugin zip file from the [GitHub release](https://github.com/yaohui-wyh/StatisticsView/releases/latest) and install manually via `Settings | Plugins | Install plugin from disk`
+
+## Usage
 
 The plugin registers a title bar button in the **Project** tool window, which provides the following menu options:
 
@@ -34,11 +37,11 @@ The plugin registers a title bar button in the **Project** tool window, which pr
     - **Clear Statistics Data**: clear old raw events and pre-aggregated results for the current project. Note that it doesn't turn off logging simultaneously. Be careful that this operation is unrecoverable.
     - **Show Data File**: locate the current project's event log file in Finder/Explorer.
 
-### How it works
+## How it works
 
 This plugin is highly inspired by [**activity-tracker**](https://github.com/dkandalov/activity-tracker) as well as some components of the [**intellij-community**](https://github.com/JetBrains/intellij-community) project. Apart from recording events, **StatisticsView** tries to provide some real-time analytical features integrated with the IDE, e.g. adding additional info in the Project view.
 
-#### Event
+### Event
 
 StatisticsView subscribes to [listeners](https://plugins.jetbrains.com/docs/intellij/plugin-listeners.html) provided by the IntelliJ Platform for various IDE events, such as file opened, code completion, jump to definition, etc.
 
@@ -46,9 +49,9 @@ StatisticsView subscribes to [listeners](https://plugins.jetbrains.com/docs/inte
 
 Whenever an event is received, StatisticsView records the event type, timestamp, and fileUri (only if the event is file related). StatisticsView won't process events for files that are not valid source files (e.g. binary files, library folders, intentionally "marked as excluded" directories would be ignored).
 
-#### Data Storage
+### Data Storage
 
-StatisticsView saves events directly to a disk file to ensure minimal dependency. This brings some limitations, such as it could be impossible to make complex queries on the file-based datasets, e.g. filter by time range,  group by directory, downsampling, etc. Since we need to show summarized information in real-time in the IDE Project view, the query could only be performed against some pre-aggregated data structure in memory.
+StatisticsView saves events directly to a disk file to ensure minimal dependency. This brings some limitations, such as it could be impossible to make complex queries on the file-based datasets, e.g. filter by time range,  group by directory, etc. Since we need to show summarized information in real-time in the IDE Project view, the query could only be performed against some pre-aggregated data structure in memory.
 
 The write load is relatively low (10+ writes per second at most after debounced / dedup) and events could be safely queued on a file writer and saved to disk periodically in the background thread (EDT) which would not impact IDE performance.
 
@@ -56,7 +59,7 @@ The write load is relatively low (10+ writes per second at most after debounced 
 
 So if you are accumulating the event logs for a very long period of time, better migrate the raw data into some external data storage (e.g. TSDB) and perform your data analysis offline.
 
-#### Data format
+### Data format
 
 > For the current version (1.0.0), each event is serialized into JSON string format, which could change in future versions.
 
@@ -80,7 +83,9 @@ Example of log file:
 
 > Note: most of this part is not closely related to the duty of the StatisticsView plugin. There are many similarities between IDE code activities and microservices observability concepts.
 
-#### TimescaleDB & Grafana dashboard [WIP]
+### Import event data into PostgreSQL [Experimental]
+
+checkout [data-analysis-poc](./data-analysis-poc) for a k8s manifest for importing event logs into PostgreSQL and visualizing in Grafana dashboard (WIP)
 
 <img src="docs/grafana.png" width="800"/>
 
