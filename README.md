@@ -49,11 +49,11 @@ StatisticsView subscribes to [listeners](https://plugins.jetbrains.com/docs/inte
 
 Whenever an event is received, StatisticsView records the event type, timestamp, and fileUri (only if the event is file related). StatisticsView won't process events for files that are not valid source files (e.g. binary files, library folders, intentionally "marked as excluded" directories would be ignored).
 
-### Data Storage
+### Data storage
 
-StatisticsView saves events directly to a disk file to ensure minimal dependency. This brings some limitations, such as it could be impossible to make complex queries on the file-based datasets, e.g. filter by time range,  group by directory, etc. Since we need to show summarized information in real-time in the IDE Project view, the query could only be performed against some pre-aggregated data structure in memory.
+StatisticsView saves events directly to a disk file to ensure minimal dependency. This brings some limitations, such as it could be impossible to make complex queries on the file-based datasets, e.g. filter by time range, group by directory, etc. Since we need to show summarized information in real-time in the IDE Project view, the query could only be performed against some pre-aggregated data structure in memory.
 
-The write load is relatively low (10+ writes per second at most after debounced / dedup) and events could be safely queued on a file writer and saved to disk periodically in the background thread (EDT) which would not impact IDE performance.
+The write load is relatively low (10+ writes per second at most after debounced / dedup) and events could be safely queued on a file writer and saved to disk periodically in the background thread which would not impact IDE performance.
 
 > This pre-aggregated hashMap + async file writer practice couldn't handle back-filling situations: e.g. when the user performs a file renamed action in IDE, events with the previous fileUri should be updated.
 
@@ -79,15 +79,43 @@ Example of log file:
 {"ts":1661075850804,"action":"IDE_DEACTIVATED","file":"","tags":{}}
 ```
 
-## Data Analysis & IDE Productivity [WIP]
+## Impact on IDE (FAQ)
+
+### Performance
+
+1. If I `enable logging` all the time, will it slow down IDE startup?
+    - No. Long-running & IO-bound tasks (e.g. serialize/deserialize events data, R/W log file) are executed on the pooled thread and will not affect the IDE responsiveness. You can check the startup cost for plugins using the IntelliJ IDE's built-in diagnostic tools: `IDE Help | Diagnostic Tools | Analyze Plugin Startup Performance`:
+    - <img src="docs/ide-diagnostic.png" width="480" alt="diagnostic"/>
+    - IDE events handling are performed in the event dispatch thread (EDT) which will not block the UI thread.
+2. Since events keep accumulating, will they eat up my memory?
+    - The raw events are queued in memory and written to the disk file periodically, and once the writing is done, they are cleared from the queue and got garbage collected.
+3. The only negative performance impact is the Project view if you turn on `Show File Statistics`/`Show Directory Statistics` which adds statistical information next to each file/directory node. The ProjectView rendering finishes instantly most of the time, however if the project consists of a huge amount of files, the total rendering cost could be significant. If you encounter some sluggishness with the Project view, just turn off the `Show ... Statistics` actions, and turn on them when you need to see the statistical information.
+
+### Data
+
+1. Where is the raw event log stored?
+    - The raw event log (`stat.log`) is saved in the project `.idea` folder, and IDE doesn't need your permission to read/write from somewhere other than the current project's folder. It's by nature project-wide, and you won't bother cleaning up the log once you delete the IDE project. It would also be less likely to mess up your VCS since most projects' `.idea` folder is already ignored.
+2. Can I safely share the log file with someone else?
+    - Sure. No personal identity information (e.g. username, hostname) is logged, and all `fileUri` are saved as the relative path to the project root.
+3. Any telemetry or data reporting?
+    - No and never.
+4. Log rotation / data compression
+    - Will be provided in v1.0.2.
+
+## Data analysis & IDE productivity [WIP]
 
 > Note: most of this part is not closely related to the duty of the StatisticsView plugin. There are many similarities between IDE code activities and microservices observability concepts.
 
 ### Import event data into PostgreSQL [Experimental]
 
-checkout [data-analysis-poc](./data-analysis-poc) for a k8s manifest for importing event logs into PostgreSQL and visualizing in Grafana dashboard (WIP)
+checkout [data-analysis-poc](./data-analysis-poc) for a k8s manifest for importing event logs into PostgreSQL and visualizing in Grafana dashboard
 
-<img src="docs/grafana.png" width="800"/>
+<img src="docs/grafana-dashboard.png" width="800" alt="grafana dashboard"/>
+
+## Acknowledgment
+
+- Thank [@dkandalov] for creating the awesome plugin [activity-tracker](https://github.com/dkandalov/activity-tracker).
+- Thank [@unknwon] for helping with documentation and guides for the OSS project structure.
 
 <!-- Badges -->
 
@@ -97,3 +125,8 @@ checkout [data-analysis-poc](./data-analysis-poc) for a k8s manifest for importi
 [plugin-downloads-svg]: http://img.shields.io/jetbrains/plugin/d/19747
 [plugin-rating-svg]: http://img.shields.io/jetbrains/plugin/r/stars/19747
 [plugin-version-svg]: https://img.shields.io/jetbrains/plugin/v/19747?label=version
+
+<!-- Badges -->
+
+[@dkandalov]: https://github.com/dkandalov
+[@unknwon]: https://github.com/unknwon

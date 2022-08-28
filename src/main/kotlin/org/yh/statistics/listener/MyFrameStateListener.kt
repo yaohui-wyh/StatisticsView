@@ -12,6 +12,9 @@ import org.yh.statistics.StatisticsData
 import org.yh.statistics.model.StatisticsEvent
 
 
+/**
+ * Listen to IDE activated/deactivated events (i.e., IDE move back to foreground or lost focus)
+ */
 class MyFrameStateListener : FrameStateListener {
 
     override fun onFrameDeactivated() {

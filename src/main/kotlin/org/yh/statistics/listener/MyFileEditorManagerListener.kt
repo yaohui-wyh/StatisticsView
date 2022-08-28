@@ -12,6 +12,9 @@ import org.yh.statistics.StatisticsTag.FILE_LINE_OF_CODE
 import org.yh.statistics.model.StatisticsEvent
 
 
+/**
+ * Listen to Editor fileOpen / fileClose event
+ */
 class MyFileEditorManagerListener(val project: Project) : FileEditorManagerListener {
 
     private val settings = project.service<PluginSettings>()
