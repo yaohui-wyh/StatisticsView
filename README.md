@@ -19,6 +19,8 @@ More information can be found on [GitHub](https://github.com/yaohui-wyh/Statisti
 
 <img src="docs/demo.gif" width="640" alt="demo"/>
 
+> Some background story behind building the StatisticsView plugin: [docs/README.md](./docs/README.md)
+
 ## Installation
 
 - **StatisticsView** can be installed from an IntelliJ IDE via `Settings | Plugins`. See the [detailed instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#) from the JetBrains guide.
