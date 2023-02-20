@@ -49,6 +49,7 @@ val Long.duration: String
     get() {
         val millis = Duration.ofMillis(this)
         return when {
+            millis.toSeconds() <= 0 -> "0s"
             millis.toMinutes() <= 0 -> "${millis.toSeconds()}s"
             millis.toHours() <= 0 -> "${millis.toMinutes()}m"
             millis.toDays() <= 0 -> "${millis.toHours()}h"

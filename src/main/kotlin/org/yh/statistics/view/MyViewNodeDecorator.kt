@@ -42,7 +42,7 @@ class MyViewNodeDecorator(private val project: Project) : ProjectViewNodeDecorat
 
     private fun decorateFileNode(file: VirtualFile): String {
         if (!settings.showFileViewStatistics) return ""
-        return dataManager.getFileAggregateResult(file.relativeUrl(project))?.getLastViewedHintText().orEmpty()
+        return dataManager.getFileAggregateResult(file.relativeUrl(project))?.renderStatisticsHint().orEmpty()
     }
 
     private fun decorateDirectoryNode(file: VirtualFile): String {
