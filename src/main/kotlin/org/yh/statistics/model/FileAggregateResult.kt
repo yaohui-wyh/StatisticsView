@@ -1,16 +1,14 @@
 package org.yh.statistics.model
 
-import org.yh.statistics.StatisticsAction
+import org.yh.statistics.*
 import org.yh.statistics.StatisticsAction.*
-import org.yh.statistics.delta
-import org.yh.statistics.duration
-import org.yh.statistics.localDate
+import org.yh.statistics.StatisticsHintTemplateMarker.*
 import java.time.Duration
 
-class FileAggregateResult(
+data class FileAggregateResult(
     var openCounts: Int = 0,
     var totalInMillis: Long = 0,
-    private var lastClosedTs: Timestamp = 0
+    var lastClosedTs: Timestamp = 0
 ) {
 
     private var fileState: StatisticsAction? = null
@@ -52,18 +50,27 @@ class FileAggregateResult(
         updateLastClosedTs(event)
     }
 
-    fun getLastViewedHintText(): String {
-        var lastViewedHintText = ""
-        if (lastClosedTs > 0) {
-            lastClosedTs.localDate?.delta?.let { lastViewedHintText = "Last viewed: $it." }
-        }
-        if (openCounts > 0 && totalInMillis > 1_000) {
-            val countsStr = if (openCounts > 100) "100+" else openCounts
-            lastViewedHintText += " ($countsStr times, total ${totalInMillis.duration})"
-        }
-        return lastViewedHintText
+    fun renderStatisticsHint() = template.render(this)
+}
+
+class StatisticsHintTemplate(private val template: String) {
+
+    fun validate(): Boolean {
+        // TODO: to be used in configuration panel
+        return true
+    }
+
+    fun render(result: FileAggregateResult): String {
+        var text = template
+        val (openCounts, totalInMillis, lastClosedTs) = result
+        text = text.replace(LAST_VIEWED.pattern, if (lastClosedTs > 0) lastClosedTs.localDate?.delta.orEmpty() else "")
+        text = text.replace(OPEN_COUNTS.pattern, if (openCounts > 100) "100+" else openCounts.toString())
+        text = text.replace(TOTAL_TIME.pattern, totalInMillis.duration)
+        return text
     }
 }
+
+val template = StatisticsHintTemplate(System.getProperty("statisticsView.hint.template", DEFAULT_HINT_TEMPLATE))
 
 sealed class FocusState(var ts: Timestamp)
 class FocusGained(ts: Timestamp) : FocusState(ts)
