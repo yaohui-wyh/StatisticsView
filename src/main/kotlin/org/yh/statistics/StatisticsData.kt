@@ -15,9 +15,13 @@ import java.util.concurrent.TimeUnit
 
 
 /**
- * Aggregated statistics data holder.
+ * A project-level singleton that serves as a holder for aggregated statistics data.
+ * This class provides thread-safe access to a list of `StatisticsEvent` objects
+ * and a map that maps file URIs to `FileAggregateResult` objects.
+ * It also provides functions for adding events, processing events,
+ * and retrieving file-specific aggregate results.
  *
- * This is a project-level singleton, and its instance will be created in {@link PostStartupActivity#runActivity}
+ * Its instance will be created in {@link PostStartupActivity#runActivity}.
  * Getting this service can be performed from any thread.
  */
 @Service(Service.Level.PROJECT)
@@ -39,7 +43,7 @@ class StatisticsData(private val project: Project) {
         app.executeOnPooledThread { processEvents(log.importEvents()) }
         scheduler.scheduleWithFixedDelay({
             if (project.service<PluginSettings>().enableLogging) {
-                app.executeOnPooledThread { saveData() }
+                app.executeOnPooledThread { writeEventsToLog() }
             }
         }, 30, 30, TimeUnit.SECONDS)
     }
@@ -55,7 +59,7 @@ class StatisticsData(private val project: Project) {
         }
     }
 
-    fun saveData() {
+    fun writeEventsToLog() {
         if (events.isNotEmpty()) {
             log.writeEvents(events)
             events.clear()
@@ -69,8 +73,7 @@ class StatisticsData(private val project: Project) {
         summaryInfo = StatisticsSummaryInfo()
     }
 
-    @VisibleForTesting
-    fun processEvents(list: List<StatisticsEvent>) {
+    private fun processEvents(list: List<StatisticsEvent>) {
         list
             .groupBy { it.file }
             .forEach { (file, events) ->
@@ -82,9 +85,9 @@ class StatisticsData(private val project: Project) {
                     events.forEach { event -> resultMap.values.forEach { it.accumulate(event) } }
                 }
             }
-        summaryInfo.eventCounts += list.size
+        summaryInfo = summaryInfo.copy(eventCounts = summaryInfo.eventCounts + list.size)
     }
 
 }
 
-data class StatisticsSummaryInfo(var eventCounts: Long = 0)
+data class StatisticsSummaryInfo(val eventCounts: Long = 0)

@@ -18,7 +18,7 @@ class PostStartupActivity : StartupActivity.DumbAware, Disposable {
             MyProjectWatcher.handleProjectEvent(project, PROJECT_OPENED)
             Disposer.register(project) {
                 MyProjectWatcher.handleProjectEvent(project, PROJECT_CLOSED)
-                runInEdt { project.service<StatisticsData>().saveData() }
+                runInEdt { project.service<StatisticsData>().writeEventsToLog() }
             }
         }
     }
