@@ -49,6 +49,7 @@ class TotalTimeUpdater {
             is FocusLost -> if (event.action == FILE_OPENED || (result.fileState == FILE_OPENED && event.action == IDE_ACTIVATED)) {
                 result.focusState = FocusGained(event.ts)
             }
+
             is FocusGained -> if (event.action in setOf(FILE_CLOSED, IDE_DEACTIVATED)) {
                 result.focusState = FocusLost(event.ts)
                 val duration = result.focusState.ts - prevFocusState.ts
@@ -77,7 +78,8 @@ class FileStatisticsHintFormatter(private val template: String) {
     fun format(result: FileAggregateResult): String {
         var text = template
         val (openCounts, totalInMillis, lastClosedTs) = result
-        text = text.replace(LAST_VIEWED.pattern, if (lastClosedTs > 0) lastClosedTs.localDate?.delta.orEmpty() else "")
+        if (lastClosedTs == EMPTY_TS) return ""
+        text = text.replace(LAST_VIEWED.pattern, if (lastClosedTs > EMPTY_TS) lastClosedTs.localDate?.delta.orEmpty() else "")
         text = text.replace(OPEN_COUNTS.pattern, if (openCounts > 100) "100+" else openCounts.toString())
         text = text.replace(TOTAL_TIME.pattern, totalInMillis.duration)
         return text
@@ -91,3 +93,4 @@ class FocusGained(ts: Timestamp) : FocusState(ts)
 class FocusLost(ts: Timestamp) : FocusState(ts)
 
 typealias Timestamp = Long
+const val EMPTY_TS = 0L
