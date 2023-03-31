@@ -1,15 +1,17 @@
 package org.yh.statistics.listener
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
-import org.yh.statistics.*
 import org.yh.statistics.StatisticsAction.FILE_CLOSED
 import org.yh.statistics.StatisticsAction.FILE_OPENED
 import org.yh.statistics.StatisticsTag.FILE_LINE_OF_CODE
 import org.yh.statistics.model.StatisticsEvent
+import org.yh.statistics.model.addEvents
+import org.yh.statistics.refreshView
+import org.yh.statistics.relativeUrl
+import org.yh.statistics.shouldHandleStatistics
 
 
 /**
@@ -17,20 +19,15 @@ import org.yh.statistics.model.StatisticsEvent
  */
 class MyFileEditorManagerListener(val project: Project) : FileEditorManagerListener {
 
-    private val settings = project.service<PluginSettings>()
-    private val statisticsData = project.service<StatisticsData>()
-
-    override fun selectionChanged(event: FileEditorManagerEvent) {
-        if (!settings.enableLogging) return
+    private fun buildStatisticsEvents(project: Project, event: FileEditorManagerEvent): List<StatisticsEvent> {
         val oldEditor = (event.oldEditor as? TextEditor)?.editor
         val oldDocument = oldEditor?.document
         val closeEvent = event.oldFile?.let {
             if (it.shouldHandleStatistics(project)) {
                 StatisticsEvent(
-                    System.currentTimeMillis(),
-                    FILE_CLOSED,
-                    it.relativeUrl(project),
-                    mapOf(FILE_LINE_OF_CODE.name to oldDocument?.lineCount.toString())
+                    action = FILE_CLOSED,
+                    file = it.relativeUrl(project),
+                    tags = mapOf(FILE_LINE_OF_CODE.name to oldDocument?.lineCount.toString())
                 )
             } else null
         }
@@ -39,14 +36,17 @@ class MyFileEditorManagerListener(val project: Project) : FileEditorManagerListe
         val openEvent = event.newFile?.let {
             if (it.shouldHandleStatistics(project)) {
                 StatisticsEvent(
-                    System.currentTimeMillis(),
-                    FILE_OPENED,
-                    it.relativeUrl(project),
-                    mapOf(FILE_LINE_OF_CODE.name to newDocument?.lineCount.toString())
+                    action = FILE_OPENED,
+                    file = it.relativeUrl(project),
+                    tags = mapOf(FILE_LINE_OF_CODE.name to newDocument?.lineCount.toString())
                 )
             } else null
         }
-        statisticsData.addEvents(listOfNotNull(closeEvent, openEvent))
-        if (settings.showFileViewStatistics) project.refreshView()
+        return listOfNotNull(closeEvent, openEvent)
+    }
+
+    override fun selectionChanged(event: FileEditorManagerEvent) {
+        addEvents(project) { buildStatisticsEvents(project, event) }
+        project.refreshView()
     }
 }

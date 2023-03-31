@@ -32,12 +32,10 @@ class MyViewTreeStructureProvider(private val project: Project) : TreeStructureP
     }
 
     private fun shouldHideNode(node: AbstractTreeNode<*>): Boolean {
-        if (node is PsiFileNode) {
-            return node.virtualFile?.let { dataManager.isFileViewed(it.relativeUrl(project)) } ?: true
+        return when (node) {
+            is PsiFileNode -> node.virtualFile?.let { dataManager.isFileViewed(it.relativeUrl(project)) } ?: true
+            is PsiDirectoryNode -> node.children.isEmpty() || node.children.all { shouldHideNode(it) }
+            else -> false
         }
-        if (node is PsiDirectoryNode) {
-            return node.children.isEmpty() || node.children.all { shouldHideNode(it) }
-        }
-        return false
     }
 }

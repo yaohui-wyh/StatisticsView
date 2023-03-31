@@ -30,8 +30,8 @@ class StatisticsDataTest : LightPlatform4TestCase() {
 
     @Test
     fun `addEvents & clearEvents`() {
-        val e1 = StatisticsEvent(System.currentTimeMillis(), FILE_OPENED, fileUri, tags)
-        val e2 = StatisticsEvent(System.currentTimeMillis(), FILE_CLOSED, fileUri, tags)
+        val e1 = StatisticsEvent(action = FILE_OPENED, file = fileUri, tags = tags)
+        val e2 = StatisticsEvent(action = FILE_CLOSED, file = fileUri, tags = tags)
         instance.addEvents(listOf(e1, e2))
 
         assertEquals("2 events with fileUri added", 2, instance.events.filter { it.file.isNotBlank() }.size)

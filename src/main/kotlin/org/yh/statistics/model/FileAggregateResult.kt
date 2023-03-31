@@ -8,7 +8,7 @@ import java.time.Duration
 data class FileAggregateResult(
     var openCounts: Int = 0,
     var totalInMillis: Long = 0,
-    var lastClosedTs: Timestamp = 0
+    var lastClosedTs: Timestamp = EMPTY_TS
 ) {
     var fileState: StatisticsAction? = null
     var focusState: FocusState = FocusLost(0)

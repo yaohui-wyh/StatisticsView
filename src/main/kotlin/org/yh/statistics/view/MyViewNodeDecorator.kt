@@ -51,12 +51,9 @@ class MyViewNodeDecorator(private val project: Project) : ProjectViewNodeDecorat
         VfsUtil.iterateChildrenRecursively(file, { it.shouldHandleStatistics(project) }) { f ->
             if (!f.isDirectory) {
                 directoryInfo.total++
-                dataManager.getFileAggregateResult(f.relativeUrl(project))?.let {
-                    if (it.openCounts > 0) {
-                        directoryInfo.viewed++
-                    }
-                    directoryInfo.totalTimeInMillis += it.totalInMillis
-                }
+                dataManager.getFileAggregateResult(f.relativeUrl(project))
+                    ?.takeIf { it.openCounts > 0 }?.apply { directoryInfo.viewed++ }
+                    ?.takeIf { it.totalInMillis > 0 }?.apply { directoryInfo.totalTimeInMillis += this.totalInMillis }
             }
             return@iterateChildrenRecursively true
         }

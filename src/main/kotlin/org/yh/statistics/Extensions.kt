@@ -1,6 +1,7 @@
 package org.yh.statistics
 
 import com.intellij.ide.projectView.ProjectView
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
@@ -69,5 +70,7 @@ val LocalDateTime.delta: String
     }
 
 fun Project.refreshView() {
-    ProjectView.getInstance(this).refresh()
+    if (service<PluginSettings>().showFileViewStatistics) {
+        ProjectView.getInstance(this).refresh()
+    }
 }
