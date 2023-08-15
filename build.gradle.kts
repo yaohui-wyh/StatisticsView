@@ -5,10 +5,14 @@ import java.lang.System.getenv
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.serialization") version "1.7.10"
-    id("org.jetbrains.intellij") version "1.13.0"
-    id("org.jetbrains.changelog") version "1.3.1"
+    alias(libs.plugins.kotlin) // Kotlin support
+    alias(libs.plugins.kotlinSerialization) // Kotlin serialization support
+    alias(libs.plugins.gradleIntelliJPlugin) // Gradle IntelliJ Plugin
+    alias(libs.plugins.changelog) // Gradle Changelog Plugin
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 group = properties("pluginGroup")
@@ -33,10 +37,6 @@ changelog {
 tasks {
     wrapper {
         gradleVersion = properties("gradleVersion")
-    }
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
-        kotlinOptions.freeCompilerArgs += arrayOf("-opt-in=kotlin.RequiresOptIn")
     }
 
     patchPluginXml {
