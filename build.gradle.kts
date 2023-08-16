@@ -11,6 +11,10 @@ plugins {
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
 }
 
+dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.5.1")
+}
+
 kotlin {
     jvmToolchain(17)
 }
